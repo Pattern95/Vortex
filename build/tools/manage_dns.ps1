@@ -1,4 +1,4 @@
-param (
+﻿﻿param (
     [string]$Action = "menu",
     [string]$Preset = "comss",
     [string]$PrimaryDns = "",
@@ -111,13 +111,26 @@ function Set-CustomDns([string]$dns1, [string]$dns2) {
         $origDesc = if ($isDhcp) { "DHCP ($($ipv4Dns -join ', '))" } else { "Static ($($ipv4Dns -join ', '))" }
         Write-LogMsg "DNS '$($a.Name)': $origDesc -> $dns1, $dns2"
 
+        $setSuccess = $false
         try {
-            Set-DnsClientServerAddress -InterfaceAlias $a.Name -ServerAddresses ($dns1, $dns2)
+            Set-DnsClientServerAddress -InterfaceAlias $a.Name -ServerAddresses ($dns1, $dns2) -ErrorAction Stop
+            $setSuccess = $true
             $okMsg = if ($isRu) { "[OK] Адаптер '$($a.Name)': установлен DNS $dns1, $dns2" } else { "[OK] Adapter '$($a.Name)': set DNS to $dns1, $dns2" }
             Write-Host $okMsg -ForegroundColor Green
-        } catch {
-            $errMsg = if ($isRu) { "[!] Ошибка для '$($a.Name)': $_" } else { "[!] Error on '$($a.Name)': $_" }
-            Write-Host $errMsg -ForegroundColor Red
+        } catch { }
+
+        if (-not $setSuccess) {
+            try {
+                netsh interface ipv4 set dns name="$($a.Name)" static $dns1 primary | Out-Null
+                if ($dns2) {
+                    netsh interface ipv4 add dns name="$($a.Name)" $dns2 index=2 | Out-Null
+                }
+                $okMsg = if ($isRu) { "[OK netsh] Адаптер '$($a.Name)': установлен DNS $dns1, $dns2" } else { "[OK netsh] Adapter '$($a.Name)': set DNS to $dns1, $dns2" }
+                Write-Host $okMsg -ForegroundColor Green
+            } catch {
+                $errMsg = if ($isRu) { "[!] Ошибка для '$($a.Name)': $_" } else { "[!] Error on '$($a.Name)': $_" }
+                Write-Host $errMsg -ForegroundColor Red
+            }
         }
     }
 
@@ -150,14 +163,24 @@ function Reset-AllDnsToDhcp {
 
     $adapters = Get-NetAdapter | Where-Object Status -eq 'Up'
     foreach ($a in $adapters) {
+        $resetSuccess = $false
         try {
-            Set-DnsClientServerAddress -InterfaceAlias $a.Name -ResetServerAddresses
+            Set-DnsClientServerAddress -InterfaceAlias $a.Name -ResetServerAddresses -ErrorAction Stop
+            $resetSuccess = $true
             Write-LogMsg "RESET DHCP: '$($a.Name)'"
             $okMsg = if ($isRu) { "[OK] '$($a.Name)' переключен на DHCP." } else { "[OK] '$($a.Name)' reset to DHCP." }
             Write-Host $okMsg -ForegroundColor Green
-        } catch {
-            $errMsg = if ($isRu) { "[!] Ошибка для '$($a.Name)': $_" } else { "[!] Error on '$($a.Name)': $_" }
-            Write-Host $errMsg -ForegroundColor Red
+        } catch { }
+
+        if (-not $resetSuccess) {
+            try {
+                netsh interface ipv4 set dns name="$($a.Name)" dhcp | Out-Null
+                $okMsg = if ($isRu) { "[OK netsh] '$($a.Name)' переключен на DHCP." } else { "[OK netsh] '$($a.Name)' reset to DHCP." }
+                Write-Host $okMsg -ForegroundColor Green
+            } catch {
+                $errMsg = if ($isRu) { "[!] Ошибка для '$($a.Name)': $_" } else { "[!] Error on '$($a.Name)': $_" }
+                Write-Host $errMsg -ForegroundColor Red
+            }
         }
     }
     Clear-DnsClientCache

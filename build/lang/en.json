@@ -149,5 +149,8 @@
   "notify_server_prefix": "Server: ",
   "notify_ping_prefix": "Ping: ",
   "singbox_failed_to_start": "Failed to start sing-box core or the process crashed unexpectedly!",
-  "core_stopped_unexpected": "sing-box core terminated unexpectedly! Bypass stopped."
+  "core_stopped_unexpected": "sing-box core terminated unexpectedly! Bypass stopped.",
+  "dns_check_title": "Vortex — DNS Setup",
+  "dns_check_prompt": "Your DNS cannot reliably find access keys! It is recommended to switch system DNS to Cloudflare (1.1.1.1 / 1.0.0.1) or Google (8.8.8.8 / 8.8.4.4).\n\nWould you like us to configure Google DNS for you?",
+  "dns_applied_success": "Google DNS (8.8.8.8 / 8.8.4.4) applied successfully!"
 }

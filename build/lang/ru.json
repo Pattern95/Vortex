@@ -149,5 +149,8 @@
   "notify_server_prefix": "Сервер: ",
   "notify_ping_prefix": "Пинг: ",
   "singbox_failed_to_start": "Не удалось запустить ядро sing-box или процесс завершился с ошибкой!",
-  "core_stopped_unexpected": "Ядро sing-box неожиданно завершило работу! Обход остановлен."
+  "core_stopped_unexpected": "Ядро sing-box неожиданно завершило работу! Обход остановлен.",
+  "dns_check_title": "Vortex — Настройка DNS",
+  "dns_check_prompt": "Ваш DNS плохо ищет ключи доступа! Рекомендуется переключить системный DNS на Cloudflare (1.1.1.1 / 1.0.0.1) или Google (8.8.8.8 / 8.8.4.4)\n\nХотите, чтобы мы сделали это за Вас?",
+  "dns_applied_success": "Google DNS (8.8.8.8 / 8.8.4.4) успешно применен!"
 }
